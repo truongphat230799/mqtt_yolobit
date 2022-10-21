@@ -107,7 +107,6 @@ class MQTT:
             #print(key)
     
     def publish(self, topic, message):
-        last_time = 0
         if self.client == None:
             return
         last_time = time.ticks_ms()

@@ -111,13 +111,16 @@ class MQTT:
         if self.client == None:
             return
         last_time = time.tick_ms()
-        if time.tick_ms() - last_time >= 1000:
+        while time.tick_ms() - last_time >= 1000:
             topic = self.topic_prefix + str(topic)
             self.client.publish(topic, str(message))
-        else:
-            time.sleep_ms(1000-last_time)
-            topic = self.topic_prefix + str(topic)
-            self.client.publish(topic, str(message))
+            break
+            last_time = time.tick_ms()
+       
+        time.sleep_ms(1000-last_time)
+        topic = self.topic_prefix + str(topic)
+        self.client.publish(topic, str(message))
+        last_time = time.tick_ms()
 mqtt = MQTT()
 
 def unit_test():    

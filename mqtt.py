@@ -19,6 +19,7 @@ class MQTT:
         self.wifi_ssid = ''
         self.wifi_password = ''
         self.callbacks = {}
+        self.last_sent = 0
 
     def __on_receive_message(self, topic, msg):
         #print((str(topic), str(msg)))
@@ -109,16 +110,12 @@ class MQTT:
     def publish(self, topic, message):
         if self.client == None:
             return
-        last_time = time.ticks_ms()
-        if time.ticks_ms() - last_time >= 1000:
-            topic = self.topic_prefix + str(topic)
-            self.client.publish(topic, str(message))
-            last_time = time.ticks_ms()
-        else:
-            time.sleep_ms(1000-last_time)
-            topic = self.topic_prefix + str(topic)
-            self.client.publish(topic, str(message))
-            last_time = time.ticks_ms()
+        now = time.ticks_ms()
+        if now - self.last_sent < 1000:
+            time.sleep_ms(1000-(now-self.last_sent))
+        topic = self.topic_prefix + str(topic)
+        self.client.publish(topic, str(message))
+        self.last_sent = time.ticks_ms()
 mqtt = MQTT()
 
 def unit_test():    
